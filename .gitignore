@@ -1,0 +1,6 @@
+shared
+inbound
+logs
+plugins
+processed
+__pycache__
