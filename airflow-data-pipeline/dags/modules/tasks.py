@@ -1,23 +1,22 @@
 import os, re
 import pandas as pd
 from airflow.decorators import task
-from modules.settings import INBOUND_DIR, DB_USER, DB_PASS, DB_HOST, DB_NAME, DB_PORT
+from modules.settings import DB_URI, INBOUND_DIR
 from sqlalchemy import create_engine
-from dateutil.parser import parse
 
-engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+engine = create_engine(DB_URI)
 
 @task()
 def get_files():
     return os.listdir(INBOUND_DIR)
 
-@task()    
-def extract(files: str, match_re=".*", **kwargs):    
-    execution_date = kwargs.get("execution_date")
+@task()
+def extract(files, match_re=".*", **kwargs):
+    execution_date = kwargs["execution_date"]
     dataframes = []
     files = [file for file in files if re.match(match_re, file)]
     d = execution_date.strftime("%Y-%m-%d")
-    files = [file for file in files if re.match(f".*{d}.csv", file)]
+    files = [file for file in files if re.match(f".*{d}.*.csv", file)]
     for file in files:
         path = os.path.join(INBOUND_DIR, file)
         df = pd.read_csv(path)
@@ -27,13 +26,22 @@ def extract(files: str, match_re=".*", **kwargs):
 @task()
 def transform(x):
     df = pd.read_json(x)
-    # apply some data transformations here
+    # apply a transformation here
+    return df.to_json()
+
+
+def transform_revenue_fn(x):
+    df = pd.read_json(x)
+    df["price_in_cents"] = df["price"] * 100    
     return df.to_json()
 
 @task()
-def load(x, table_name=""):    
-    if table_name == "":
-        return
+def transform_revenue(x):
+    return transform_revenue_fn(x)
+
+
+@task()
+def load(x, table_name):
     df = pd.read_json(x)
-    df.to_sql(table_name, engine, if_exists='append', chunksize=1000)
-    print(f"synced {len(df)} records in table {table_name}")    
+    df.to_sql(table_name, engine, if_exists="append", index=False)
+    print(f"synced {table_name} with {len(df)} rows")
