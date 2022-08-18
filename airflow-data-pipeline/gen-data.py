@@ -4,7 +4,7 @@ from faker import Faker
 
 
 fake = Faker()
-dates = pd.date_range(start="2022-08-01",end="2022-08-10")
+dates = pd.date_range(start="2022-08-01",end="2022-09-07")
 
 for d in dates:
     d = d.strftime("%Y-%m-%d")
