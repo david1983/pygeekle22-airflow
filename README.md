@@ -16,5 +16,33 @@ The presentation is available online at https://docs.google.com/presentation/d/1
 
 or in the repo's slides folder.
 
-## Simple data pipeline
+## Simpleton data pipeline
+
+In this folder you can find the example of a datapipeline made using a simple script and a CRON job
+
+please create the inbound and processed folder
+
+```
+cd simple-data-pipeline &&
+mkdir inbound &&
+mkdir processed
+```
+
+run the gen-data.py script to generate mock data into the inbound folder
+
+## Airflow data pipeline
+
+In this folder you can find the example of a datapipeline made using airflow.
+please create the inbound, logs, plugins and processed folders
+
+```
+cd airflow-data-pipeline &&
+mkdir inbound &&
+mkdir processed &&
+mkdir logs &&
+mkdir plugins
+```
+
+run the gen-data.py script to generate mock data into the inbound folder
+
 
