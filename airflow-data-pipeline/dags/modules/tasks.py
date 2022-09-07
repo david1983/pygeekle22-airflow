@@ -1,6 +1,5 @@
 import os, re
 import pandas as pd
-from modules.setting import DB_URI, INBOUND_DIR
 from airflow.decorators import task
 from modules.setting import DB_URI, INBOUND_DIR
 from sqlalchemy import create_engine
