@@ -6,12 +6,15 @@ from sqlalchemy import create_engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+engine = create_engine("postgresql://user:pass@localhost:5435/postgres")
 
-inbound_dir = ""
-process_dir = ""
+inbound_dir = "/home/d4v3/dev/pygeekle22-airflow/simple-data-pipeline/inbound"
+processed_dir = "/home/d4v3/dev/pygeekle22-airflow/simple-data-pipeline/processed"
 
-# create a script to read files from the inbound directory 
-# load the content of the file in a db table 
-# and move them to the processed directory when it is done
-def load_data(**kwargs):
-    pass
+for file in os.listdir(inbound_dir):
+    logger.info(f"loading {file}")
+    path = os.path.join(inbound_dir, file)
+    df = pd.read_csv(path)
+    df.to_sql("inbound_revenues", engine, if_exists="append", index=False)
+    logger.info(f"loaded {file}")
+    shutil.move(path, processed_dir)
